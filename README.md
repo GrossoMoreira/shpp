@@ -14,11 +14,11 @@ Declare a variable or define a function and register it in shpp with a simple co
 
 shpp::service svc;	// create a service
 
-svc.export("function_name", function_ptr);
-svc.export("variable_name", variable_ref);
+svc.export_function("function_name", function_ptr);
+svc.export_variable("variable_name", variable_ref);
 
 shpp::shell sh(svc);	// create a shell for this service
-sh.start();		        //start interactive shell
+sh.start();		// start interactive shell
 ```
 
 # interactive shell

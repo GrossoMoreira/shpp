@@ -41,7 +41,7 @@ namespace shpp
 
 			public:
 				converter(int n);
-				template <typename ... A> std::string call(std::queue<std::string> q, Ret(*func)(FA...), A... args) throw (invalid_argument, no_cast_available, out_of_range, command_exception);
+				template <typename ... A> std::string call(std::queue<std::string> q, Ret(*func)(FA...), A... args) const throw (invalid_argument, no_cast_available, out_of_range, command_exception);
 		};
 
 		template <typename Current, typename ... Next> class converter<Current, Next...> {
@@ -51,7 +51,7 @@ namespace shpp
 
 			public:
 				converter<Current, Next...>(int argN);
-				template <typename ... A> std::string call (std::queue<std::string> q, Ret(*func)(FA...), A... args) throw (invalid_argument, no_cast_available, out_of_range, command_exception);
+				template <typename ... A> std::string call (std::queue<std::string> q, Ret(*func)(FA...), A... args) const throw (invalid_argument, no_cast_available, out_of_range, command_exception);
 		};
 
 		Ret(*func)(FA...);
@@ -59,7 +59,7 @@ namespace shpp
 
 		public:
 			function_cmd(std::string name, Ret(*)(FA...));
-			std::string call(std::queue<std::string> q) throw (wrong_argument_count, invalid_argument, no_cast_available, out_of_range, command_exception);
+			std::string call(std::queue<std::string> q) const throw (wrong_argument_count, invalid_argument, no_cast_available, out_of_range, command_exception);
 	};
 
 } // namespace

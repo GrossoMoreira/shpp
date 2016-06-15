@@ -13,19 +13,26 @@ INSTALL_INCLUDES = /usr/local/include/shpp
 INSTALL_LIB = /usr/local/lib
 
 CC       = g++
-CFLAGS   = -std=c++11 -fPIC -Wall -Werror -I.
+INCLUDE	 = -I. -Icpp-readline/src
+CFLAGS   = -std=c++11 -fPIC -Wall -Werror $(INCLUDE)
+
+LIBS	 = -lreadline
 
 LINKER   = g++ -o
-LFLAGS   = -shared 
+LFLAGS   = -shared $(LIBS)
 
 SRCDIR   = src
 OBJDIR   = obj
 BINDIR   = bin
 
+READLINE = $(OBJDIR)/cpp-readline.o
+
 SOURCES := $(wildcard $(SRCDIR)/*.cpp)
-INCLUDES := $(wildcard $(SRCDIR)/*.h)
+INCLUDES := $(wildcard $(SRCDIR)/*.h) cpp-readline/src
 OBJECTS := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 rm = rm -f
+
+export
 
 all: $(BINDIR)/$(TARGET) $(BINDIR)/example
 	@date
@@ -36,14 +43,17 @@ bindir:
 objdir:
 	@mkdir -p $(OBJDIR)
 
-$(BINDIR)/$(TARGET): $(OBJECTS) bindir
-	$(LINKER) $@ $(LFLAGS) $(OBJECTS)
+$(READLINE): objdir
+	$(CC) $(CFLAGS) -c cpp-readline/src/Console.cpp -o $(READLINE) $(LIBS)
 
-$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp objdir
+$(BINDIR)/$(TARGET): $(OBJECTS) bindir
+	$(LINKER) $@ $(LFLAGS) $(OBJECTS) $(READLINE)
+
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp $(READLINE) objdir
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BINDIR)/example: $(BINDIR)/$(TARGET)
-	g++ -std=c++11 -L$(BINDIR) -I. example/main.cpp -o $(BINDIR)/example -lshpp
+	$(CC) -std=c++11 -L$(BINDIR) -I. example/main.cpp -o $(BINDIR)/example -lshpp
 
 install: $(BINDIR)/$(TARGET)
 	mkdir $(INSTALL_INCLUDES)

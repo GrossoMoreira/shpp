@@ -1,0 +1,3 @@
+[submodule "cpp-readline"]
+	path = cpp-readline
+	url = https://github.com/Svalorzen/cpp-readline.git

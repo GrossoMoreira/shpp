@@ -38,7 +38,7 @@ shpp::function_cmd<Ret, FA...>::converter<T...>::converter(int n) {}
 template <typename Ret, typename ... FA>
 template <typename ... T>
 template <typename ... A>
-std::string shpp::function_cmd<Ret, FA...>::converter<T...>::call(std::queue<std::string> s, Ret(*func)(FA...), A ... args) throw (invalid_argument, no_cast_available, out_of_range, command_exception) {
+std::string shpp::function_cmd<Ret, FA...>::converter<T...>::call(std::queue<std::string> s, Ret(*func)(FA...), A ... args) const throw (invalid_argument, no_cast_available, out_of_range, command_exception) {
 	try {
 		return call_to_string<Ret, FA...>(func, args...);
 	} catch(...) {
@@ -53,7 +53,7 @@ shpp::function_cmd<Ret, FA...>::converter<Current,Next...>::converter(int n) : a
 template <typename Ret, typename ... FA>
 template <typename Current, typename ... Next>
 template <typename ... A>
-std::string shpp::function_cmd<Ret, FA...>::converter<Current,Next...>::call(std::queue<std::string> stack, Ret(*func)(FA...), A ... args) throw (invalid_argument, no_cast_available, out_of_range, command_exception) {
+std::string shpp::function_cmd<Ret, FA...>::converter<Current,Next...>::call(std::queue<std::string> stack, Ret(*func)(FA...), A ... args) const throw (invalid_argument, no_cast_available, out_of_range, command_exception) {
 	std::string arg = stack.front();
 	stack.pop();
 
@@ -78,7 +78,7 @@ shpp::function_cmd<Ret, FA...>::function_cmd(std::string name, Ret(*func)(FA...)
 }
 
 template <typename Ret, typename ... FA>
-std::string shpp::function_cmd<Ret, FA...>::call(std::queue<std::string> q) throw(wrong_argument_count, invalid_argument, no_cast_available, out_of_range, command_exception) {
+std::string shpp::function_cmd<Ret, FA...>::call(std::queue<std::string> q) const throw(wrong_argument_count, invalid_argument, no_cast_available, out_of_range, command_exception) {
 	if(q.size() != sizeof...(FA))
 		throw wrong_argument_count(get_name(), sizeof...(FA), q.size());
         return conv.call(q, func);

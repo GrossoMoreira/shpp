@@ -16,7 +16,7 @@
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-*/
+ */
 
 #ifndef _SHPP_SHELL_H_
 #define _SHPP_SHELL_H_
@@ -26,11 +26,15 @@
 namespace shpp
 {
 	class shell {
-		
+
 		// special commands
 		static const std::string exit;
 		static const std::string help;
 		static const std::string about;
+
+		service& svc;
+
+		public:
 
 		// colors
 		typedef const char* color;
@@ -38,13 +42,9 @@ namespace shpp
 		static constexpr color red = "\e[91m";		
 		static constexpr color green = "\e[92m";		
 
-		service& svc;
 
-		std::string call(std::string command, std::queue<std::string> args);
-
-		public:
-			shell (service&);
-			void start();
+		shell (service&);
+		void start();
 	};
 }
 

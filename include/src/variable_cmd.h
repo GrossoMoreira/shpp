@@ -32,7 +32,7 @@
 template <typename T> shpp::variable_cmd<T>::variable_cmd(std::string name, T& var) : i_cmd(name, 1), variable(var) {
 }
 
-template <typename T> std::string shpp::variable_cmd<T>::call(std::queue<std::string> q) throw(out_of_range, no_cast_available, wrong_argument_count, invalid_argument) {
+template <typename T> std::string shpp::variable_cmd<T>::call(std::queue<std::string> q) const throw(out_of_range, no_cast_available, wrong_argument_count, invalid_argument) {
 	if(q.empty())
 		return shpp::to_string(variable);
 	else if (q.size() > 1)
@@ -54,7 +54,7 @@ template <typename T> std::string shpp::variable_cmd<T>::call(std::queue<std::st
 template <typename T> shpp::variable_cmd<const T>::variable_cmd(std::string name, const T& var) : i_cmd(name, 0), variable(var) {
 }
 
-template <typename T> std::string shpp::variable_cmd<const T>::call(std::queue<std::string> q) throw(out_of_range, no_cast_available, wrong_argument_count, read_only_variable) {
+template <typename T> std::string shpp::variable_cmd<const T>::call(std::queue<std::string> q) const throw(out_of_range, no_cast_available, wrong_argument_count, read_only_variable) {
 	if(q.empty())
 		return shpp::to_string<T>(variable);
 	

@@ -4,9 +4,14 @@ Call c++ functions from a shell with any arguments of any types parsed automatic
 Declare a variable or define a function and register it in shpp with a simple command. Your function will be available to be called by a shell that parses the arguments automatically to the types of the arguments of your function.
 
 # features
-- read and write variables at runtime (const/read-only variables supported)
 - call functions with any number of arguments of any primitive types
+- read and write variables (const/read-only variables supported)
 - when a function is called, output its return value (of any primitive type)
+- interactive and non interactive mode
+- using Svalorzen's cpp-readline library, shpp now features:
+	* auto-complete
+	* command history
+	* sourcing commands from files
 
 # interface
 ```c++
@@ -14,11 +19,11 @@ Declare a variable or define a function and register it in shpp with a simple co
 
 shpp::service svc;	// create a service
 
-svc.export_function("function_name", function_ptr);
-svc.export_variable("variable_name", variable_ref);
+svc.provide("function_name", function_ptr);
+svc.provide("variable_name", variable_ref);
 
 shpp::shell sh(svc);	// create a shell for this service
-sh.start();		// start interactive shell
+sh.start();			// start shell
 ```
 
 # interactive shell
@@ -28,9 +33,12 @@ sh.start();		// start interactive shell
 - function overloading not allowed, because we wouldn't know which overload to call
 - only primitive types for variables, function arguments and function return values are supported, because we wouldn't know how to parse user defined types from/into strings. std::string is supported though, and more useful but simple types should be added soon
 
+# dependencies
+- GNU readline
+
 # todo
-- use GNU readline library instead of current basic shell
 - give names to types, so that we can at least list the argument types of each function
 - add support for common types that may be useful, like std::vector<something>
 - support arguments of user-defined types
+- support asynchronous execution of commands
 - call functions remotely

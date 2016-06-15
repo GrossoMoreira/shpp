@@ -43,7 +43,7 @@ namespace shpp
 			std::string get_name() const;
 			unsigned int expected_args() const;
 
-			virtual std::string call(std::queue<std::string>) = 0;
+			virtual std::string call(std::queue<std::string>) const = 0;
 	};
 
 }

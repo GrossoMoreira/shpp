@@ -3,7 +3,7 @@
 
    shpp library: call c++ functions of a running program from a shell
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software; you can shpp::shell::redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
@@ -21,6 +21,11 @@
 #include "include/src/shell.h"
 #include "include/src/exceptions.h"
 
+#include "Console.hpp" // cpp-readline
+
+#include <stdio.h>
+#include <unistd.h>
+
 #include <iostream>
 #include <istream>
 #include <sstream>
@@ -28,6 +33,9 @@
 #include <string>
 #include <queue>
 #include <vector>
+
+namespace cr = CppReadline;
+using ret_code = cr::Console::ReturnCode;
 
 const std::string shpp::shell::exit = "exit";
 const std::string shpp::shell::help = "help";
@@ -44,82 +52,77 @@ static void print_about() {
 shpp::shell::shell(shpp::service& s) : svc(s) {
 }
 
-std::string shpp::shell::call(std::string command, std::queue<std::string> arguments) {
+
+static int exec_command(const shpp::i_cmd* cmd, std::queue<std::string> arguments) {
 	std::string result;
 	try {
-		std::cout << green;
-		result = svc.call(command, arguments);
-		std::cout << none;
-	} catch(invalid_argument e) {
-		std::cerr << red << "ERROR: argument " << e.argN << " is invalid" << none << std::endl;
-	} catch(out_of_range e) {
-		std::cerr << red << "ERROR: argument " << e.argN << " is out of range" << none << std::endl;
-	} catch(no_cast_available e) {
-		std::cerr << red << "ERROR: no cast avaliable for argument " << e.argN << none << std::endl;
-	} catch(cmd_not_found e) {
-		std::cerr << red << "ERROR: command \"" << e.command << "\" not found" << none << std::endl;
-	} catch(read_only_variable e) {
-		std::cerr << red << "ERROR: variable is read-only" << none << std::endl;
-	} catch(wrong_argument_count e) {
-		std::cerr << red << "ERROR: wrong argument count (expected " << e.expected << ", found " << e.provided << ")" << none << std::endl;
-	} catch(command_exception e) {
-		std::cerr << red << "ERROR: exception thrown by " << command << none << std::endl;
+		std::cout << shpp::shell::green;
+		result = cmd->call(arguments);
+		std::cout << shpp::shell::none;
+	} catch(shpp::invalid_argument e) {
+		std::cout << shpp::shell::red << "ERROR: argument " << e.argN << " is invalid" << shpp::shell::none << std::endl;
+	} catch(shpp::out_of_range e) {
+		std::cout << shpp::shell::red << "ERROR: argument " << e.argN << " is out of range" << shpp::shell::none << std::endl;
+	} catch(shpp::no_cast_available e) {
+		std::cout << shpp::shell::red << "ERROR: no cast avaliable for argument " << e.argN << shpp::shell::none << std::endl;
+	} catch(shpp::read_only_variable e) {
+		std::cout << shpp::shell::red << "ERROR: variable is read-only" << shpp::shell::none << std::endl;
+	} catch(shpp::wrong_argument_count e) {
+		std::cout << shpp::shell::red << "ERROR: wrong argument count (expected " << e.expected << ", found " << e.provided << ")" << shpp::shell::none << std::endl;
+	} catch(shpp::command_exception e) {
+		std::cout << shpp::shell::red << "ERROR: exception thrown by " << cmd->get_name() << shpp::shell::none << std::endl;
 	}
-	return result;
+
+	if(result.size() != 0)
+		std::cout << result << std::endl;
+
+	return 0;
 }
 
 void shpp::shell::start() {
+	bool interactive = isatty(fileno(stdin));
 
-	std::cin.clear();
+	if(interactive)
+		print_about();
 
-	while(true) {
-		std::string in;
+	cr::Console c(interactive ? ">" : "");
 
-		std::cout << '>';
-		std::getline(std::cin, in);
+	c.registerCommand(about,
+		[this](const cr::Console::Arguments& args) -> int {
+			print_about();
+			return 0;
+		});
 
-		if(in.substr(0, exit.size()) == exit)
-			break;
-
-		if(in.substr(0, help.size()) == help)
-		{
+	c.registerCommand(help,
+		[this](const cr::Console::Arguments& args) -> int {
+			std::cout << "Available commands:\n";
 			for(auto p : svc) {
 				const i_cmd* cmd = p.second;
 				std::cout << " - " << cmd->get_name() << " (" << cmd->expected_args() << " arg" << (cmd->expected_args() != 1 ? "s" : "") << ")" << std::endl;
 			}
-			continue;
-		}
+			return 0;
+		});
 
-		if(in.substr(0, about.size()) == about) {
-			print_about();
-			continue;
-		}
 
-		if(in.size() > 0) {
-			std::stringstream ss(in);
-			std::istream_iterator<std::string> it(ss);
-			std::istream_iterator<std::string> end;
+	for(auto p : svc) {
+		std::string cmd_name = p.first;
+		const i_cmd* cmd = p.second;
 
-			std::vector<std::string> tokens(it, end);
-			if(tokens.size() == 0) {
-				std::cerr << red << "ERROR: unable to parse command" << none << std::endl;
-				continue;
+		c.registerCommand(cmd_name,
+			[this, cmd](const cr::Console::Arguments& args)-> int { 
+				std::queue<std::string> q;
+
+				for(const std::string& s : args)
+					q.push(s);
+
+				q.pop(); // the first element is the name of the command, so remove it
+
+				return exec_command(cmd, q);
 			}
-			std::string command = tokens[0];
-			tokens.erase(tokens.begin());
-
-			std::queue<std::string> arguments;
-			for(auto s : tokens)
-				arguments.push(s);
-
-			std::string result = call(command, arguments);
-			if(result.size() != 0)
-				std::cout << result << std::endl;
-		}
-
-		if(std::cin.eof()) {
-			std::cout << std::endl;
-			break;
-		}
+		);
 	}
+
+	while(true)
+		if(c.readLine() == ret_code::Quit)
+			break;
 }

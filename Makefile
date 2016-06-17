@@ -9,6 +9,10 @@
 
 TARGET   = libshpp.so
 
+SRCDIR   = src
+OBJDIR   = obj
+BINDIR   = bin
+
 INSTALL_INCLUDES = /usr/local/include/shpp
 INSTALL_LIB = /usr/local/lib
 
@@ -21,11 +25,7 @@ LIBS	 = -lreadline
 LINKER   = g++ -o
 LFLAGS   = -shared $(LIBS)
 
-SRCDIR   = src
-OBJDIR   = obj
-BINDIR   = bin
-
-READLINE = $(OBJDIR)/cpp-readline.o
+READLINE = $(OBJDIR)/libcpp-readline.a
 
 SOURCES := $(wildcard $(SRCDIR)/*.cpp)
 INCLUDES := $(wildcard $(SRCDIR)/*.h) cpp-readline/src
@@ -44,9 +44,10 @@ objdir:
 	@mkdir -p $(OBJDIR)
 
 $(READLINE): objdir
-	$(CC) $(CFLAGS) -c cpp-readline/src/Console.cpp -o $(READLINE) $(LIBS)
+	$(MAKE) -C cpp-readline
+	@cp cpp-readline/libcpp-readline.a $(READLINE)
 
-$(BINDIR)/$(TARGET): $(OBJECTS) bindir
+$(BINDIR)/$(TARGET): $(OBJECTS) $(READLINE) bindir
 	$(LINKER) $@ $(LFLAGS) $(OBJECTS) $(READLINE)
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp $(READLINE) objdir

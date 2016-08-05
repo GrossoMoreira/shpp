@@ -21,7 +21,12 @@
 #ifndef _SHPP_CAST_H_
 #define _SHPP_CAST_H_
 
+#include "type_name.h"
 #include "exceptions.h"
+
+#include <map>
+
+#include "jsoncons/json.hpp"
 
 #include <limits>
 #include <stdexcept>
@@ -30,7 +35,10 @@
 #include <istream>
 #include <iostream>
 #include <iterator>
+#include <tuple>
 #include <vector>
+#include <typeinfo>
+#include <cxxabi.h>
 
 namespace shpp
 {
@@ -66,10 +74,119 @@ namespace shpp
 		return ss.str();
 	}
 
+	// Converting from parameter type to string
+
+	template <typename T> std::string type_str() {
+		static_string s = type_name<T>();
+		std::string n = std::string(s.data(), s.size());
+		std::string m = "std::basic_string<char>";
+		size_t p = n.find(m);
+		if(p != std::string::npos) {
+			std::string r = "std::string";
+			n.replace(p, m.size(), r);
+		}
+		return n;
+	}
+
+	// Converters between template structures and string
+
+	using json = jsoncons::json;
+
+	template <typename T> struct translator {
+		typedef T type;
+
+		static void build_json(json& j, const T& v) {
+			j.add(v);
+		}
+
+		static std::string to_str(const T& v) {
+			return to_string(v);
+		}
+
+		static T parse(std::string s) {
+			return cast<T>(s);
+		}
+
+		static std::string name() {
+			return type_str<T>();
+		}
+	};
+
+	template <template <typename...> class C, typename F, typename ... E> struct translator<C<F, E...>> {
+		typedef F type;
+
+		static void build_json(json& j, const C<F, E...>& c) {
+			json k = json::array();
+			for(auto& v : c)
+				translator<F>::build_json(k, v);
+			j.add(k);
+		}
+
+		static std::string to_str(const C<F, E...>& c) {
+			json j = json::array();
+			build_json(j, c);
+			json f = j[0];
+			std::stringstream ss;
+			ss << pretty_print(f);
+			return ss.str();
+		}
+
+		static C<F, E...> parse(std::string s) {
+			C<F, E...> c;
+			json j = json::parse(s);
+			for(auto& e : j.elements()) {
+				std::stringstream ss;
+				ss << pretty_print(e);
+				c.push_back(translator<F>::parse(ss.str()));
+			}
+			return c;
+		}
+
+		static std::string name() {
+			return type_str<C<F,E...>>();
+		}
+	};
+
+	template <> struct translator<std::string> {
+		typedef std::string type;
+
+		static void build_json(json& j, const std::string& s) {
+			j.add(s);
+		}
+
+		static std::string to_str(const std::string& s) {
+			return s;
+		}
+
+		static std::string parse(std::string s) {
+			auto b = s.cbegin();
+			auto e = s.cend();
+
+			if(s.size() > 1 && *b == '\"' && *(e-1) == '\"')
+				return std::string(b + 1, e - 1);
+
+			return s;
+		}
+
+		static std::string name() {
+			return type_str<std::string>();
+		}
+	};
+
+	template <> struct translator<void> {
+		typedef void type;
+
+		static std::string name() {
+			return type_str<void>();
+		}
+	};
+
+	// Calling void and non-void functions
+
 	template <typename Ret> class devoid {
 		public:
 			template <typename ... Args> static std::string call(Ret(*f)(Args...), Args... args) {
-				return to_string<Ret>(f(args...));
+				return translator<Ret>::to_str(f(args...));
 			}
 	};
 
@@ -84,6 +201,8 @@ namespace shpp
 	template <typename Ret, typename ... Args> std::string call_to_string(Ret(*f)(Args...), Args... args) {
 		return devoid<Ret>::call(f, args...);
 	}
+
+
 }
 
 #endif // _SHPP_CAST_H_

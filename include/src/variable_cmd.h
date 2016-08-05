@@ -29,17 +29,25 @@
 #include <queue>
 #include <iostream>
 
-template <typename T> shpp::variable_cmd<T>::variable_cmd(std::string name, T& var) : i_cmd(name, 1), variable(var) {
+template <typename T> shpp::variable_cmd<T>::variable_cmd(std::string name, T& var) : i_cmd(name), variable(var) {
+}
+
+template <typename T> shpp::i_cmd::form shpp::variable_cmd<T>::get_form() const {
+	return i_cmd::variable;
+}
+
+template <typename T> std::string shpp::variable_cmd<T>::get_return_type() const {
+	return translator<T>::name();
 }
 
 template <typename T> std::string shpp::variable_cmd<T>::call(std::queue<std::string> q) const throw(out_of_range, no_cast_available, wrong_argument_count, invalid_argument) {
 	if(q.empty())
-		return shpp::to_string(variable);
+		return translator<T>::to_str(variable);
 	else if (q.size() > 1)
 		throw wrong_argument_count(get_name(), 1, q.size());
 	else
 		try {
-			variable = cast<T>(q.front());
+			variable = translator<T>::parse(q.front());
 		} catch (std::out_of_range e) {
 			throw out_of_range (1, q.front());
 		} catch (std::invalid_argument) {
@@ -51,7 +59,15 @@ template <typename T> std::string shpp::variable_cmd<T>::call(std::queue<std::st
 	return "";
 }
 
-template <typename T> shpp::variable_cmd<const T>::variable_cmd(std::string name, const T& var) : i_cmd(name, 0), variable(var) {
+template <typename T> shpp::variable_cmd<const T>::variable_cmd(std::string name, const T& var) : i_cmd(name), variable(var) {
+}
+
+template <typename T> shpp::i_cmd::form shpp::variable_cmd<const T>::get_form() const {
+	return i_cmd::variable;
+}
+
+template <typename T> std::string shpp::variable_cmd<const T>::get_return_type() const {
+	return translator<const T>::name();
 }
 
 template <typename T> std::string shpp::variable_cmd<const T>::call(std::queue<std::string> q) const throw(out_of_range, no_cast_available, wrong_argument_count, read_only_variable) {

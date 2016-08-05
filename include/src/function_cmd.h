@@ -24,6 +24,7 @@
 #include "function_cmd.hpp"
 
 #include "cast.h"
+#include "parameter.h"
 
 #include <string>
 #include <queue>
@@ -37,10 +38,17 @@ shpp::function_cmd<Ret, FA...>::converter<T...>::converter(int n) {}
 
 template <typename Ret, typename ... FA>
 template <typename ... T>
+void shpp::function_cmd<Ret, FA...>::converter<T...>::for_each(std::function<void(const parameter&)> f) {
+}
+
+template <typename Ret, typename ... FA>
+template <typename ... T>
 template <typename ... A>
 std::string shpp::function_cmd<Ret, FA...>::converter<T...>::call(std::queue<std::string> s, Ret(*func)(FA...), A ... args) const throw (invalid_argument, no_cast_available, out_of_range, command_exception) {
 	try {
 		return call_to_string<Ret, FA...>(func, args...);
+	} catch(std::exception& e) {
+		std::cout << e.what() << std::endl;
 	} catch(...) {
 		throw command_exception();
 	}
@@ -52,13 +60,21 @@ shpp::function_cmd<Ret, FA...>::converter<Current,Next...>::converter(int n) : a
 
 template <typename Ret, typename ... FA>
 template <typename Current, typename ... Next>
+void shpp::function_cmd<Ret, FA...>::converter<Current,Next...>::for_each(std::function<void(const parameter&)> f) {
+	parameter p = parameter::make_parameter<Current>();
+	f(p);
+	next.for_each(f);
+}
+
+template <typename Ret, typename ... FA>
+template <typename Current, typename ... Next>
 template <typename ... A>
 std::string shpp::function_cmd<Ret, FA...>::converter<Current,Next...>::call(std::queue<std::string> stack, Ret(*func)(FA...), A ... args) const throw (invalid_argument, no_cast_available, out_of_range, command_exception) {
 	std::string arg = stack.front();
 	stack.pop();
 
 	try {
-		Current val = cast<Current>(arg);
+		Current val = translator<Current>::parse(arg);
 		return next.call(stack, func, args..., val);
 	} catch (std::out_of_range) {
 		throw out_of_range(argN, arg);
@@ -74,7 +90,22 @@ std::string shpp::function_cmd<Ret, FA...>::converter<Current,Next...>::call(std
 }
 
 template <typename Ret, typename ... FA>
-shpp::function_cmd<Ret, FA...>::function_cmd(std::string name, Ret(*func)(FA...)) : i_cmd(name, sizeof...(FA)), func(func), conv(1) {
+shpp::function_cmd<Ret, FA...>::function_cmd(std::string name, Ret(*func)(FA...)) : i_cmd(name), func(func), conv(1) {
+	conv.for_each(
+			[this](const parameter& p) {
+				this->add_parameter(p);
+			}
+		);	
+}
+
+template <typename Ret, typename ... FA>
+shpp::i_cmd::form shpp::function_cmd<Ret, FA...>::get_form() const {
+	return i_cmd::function;
+}
+
+template <typename Ret, typename ... FA>
+std::string shpp::function_cmd<Ret, FA...>::get_return_type() const {
+	return translator<Ret>::name();
 }
 
 template <typename Ret, typename ... FA>

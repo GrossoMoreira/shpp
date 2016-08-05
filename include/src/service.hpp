@@ -21,7 +21,7 @@
 #ifndef _SHPP_SERVICE_HPP_
 #define _SHPP_SERVICE_HPP_
 
-#include "i_cmd.h"
+#include "cmd.h"
 #include "exceptions.h"
 
 #include <string>
@@ -34,11 +34,11 @@ namespace shpp
 {
 	class service {
 
-		typedef std::unordered_map<std::string, i_cmd*>::const_iterator const_iterator;
-
 		std::unordered_map<std::string, i_cmd*> commands;
 
 		public:
+			typedef std::unordered_map<std::string, i_cmd*>::const_iterator const_iterator;
+
 			template <typename R, typename ... T> void provide(std::string name, R(*func)(T...));
 			template <typename T> void provide(std::string name, T& var);
 			void remove_command(std::string name);

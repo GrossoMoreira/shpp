@@ -22,29 +22,64 @@
 #define _SHPP_SHELL_H_
 
 #include "service.hpp"
+#include "exceptions.h"
 
 namespace shpp
 {
 	class shell {
+		public:
+			enum color_mode { colors_enabled, colors_disabled };
 
-		// special commands
-		static const std::string exit;
-		static const std::string help;
-		static const std::string about;
+		private:
 
-		service& svc;
+			enum exec_result { exec_ok, exec_error, exec_exit };
+
+			// singleton
+			static shell* singleton;
+
+			// special commands
+			static const std::string exit;
+			static const std::string help;
+			static const std::string about;
+			static const std::string source;
+
+			static char** completion_function(const char* buff, int start, int end);
+			static char* completion_matches_cb(const char* text, int state);
+
+			std::string execute(std::string command, std::queue<std::string> args, exec_result&);
+			std::string shell_commands(std::string command, std::queue<std::string> args, exec_result&) throw(cmd_not_found);
+
+			bool eval(const char* line);
+
+			void print_about();
+			void print_signature(i_cmd*);
+			void print_help();
+			void source_files(std::queue<std::string> file_names);
+
+			bool interactive;
+			service& svc;
+			color_mode colors;
+			std::string last_command;
 
 		public:
 
-		// colors
-		typedef const char* color;
-		static constexpr color none = "\e[0m";		
-		static constexpr color red = "\e[91m";		
-		static constexpr color green = "\e[92m";		
+			// colors
+			typedef const char* color;
+			static constexpr color none = "\e[0m";
+			static constexpr color red = "\e[91m";
+			static constexpr color cyan = "\e[38;5;45m";	
+			static constexpr color lightcyan = "\e[38;5;117m";	
+			static constexpr color blue = "\e[38;5;6m";
+			static constexpr color orange = "\e[38;5;208m";
+			static constexpr color yellow = "\e[93m";
+			static constexpr color green = "\e[38;5;118m";
+			static constexpr color pink = "\e[95m";	
 
+			static constexpr color bold= "\e[1m";
 
-		shell (service&);
-		void start();
+			shell (service&, color_mode colors = colors_enabled);
+			const service& get_service();
+			void start();
 	};
 }
 

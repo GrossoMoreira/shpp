@@ -22,7 +22,7 @@
 #define _SHPP_FUNCTION_CMD_HPP_
 
 #include "cast.h"
-#include "i_cmd.h"
+#include "cmd.h"
 #include "exceptions.h"
 
 #include <string>
@@ -30,6 +30,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <limits>
+#include <functional>
 
 namespace shpp
 {
@@ -41,6 +42,7 @@ namespace shpp
 
 			public:
 				converter(int n);
+				void for_each(std::function<void(const parameter&)>);
 				template <typename ... A> std::string call(std::queue<std::string> q, Ret(*func)(FA...), A... args) const throw (invalid_argument, no_cast_available, out_of_range, command_exception);
 		};
 
@@ -51,6 +53,7 @@ namespace shpp
 
 			public:
 				converter<Current, Next...>(int argN);
+				void for_each(std::function<void(const parameter&)>);
 				template <typename ... A> std::string call (std::queue<std::string> q, Ret(*func)(FA...), A... args) const throw (invalid_argument, no_cast_available, out_of_range, command_exception);
 		};
 
@@ -59,6 +62,8 @@ namespace shpp
 
 		public:
 			function_cmd(std::string name, Ret(*)(FA...));
+			i_cmd::form get_form() const;
+			std::string get_return_type() const;
 			std::string call(std::queue<std::string> q) const throw (wrong_argument_count, invalid_argument, no_cast_available, out_of_range, command_exception);
 	};
 

@@ -18,18 +18,27 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-#include "include/src/i_cmd.h"
+#ifndef _SHPP_PARAMETER_HPP_
+#define _SHPP_PARAMETER_HPP_
 
-shpp::i_cmd::i_cmd(std::string name, unsigned int num_args) : name(name), num_args(num_args) {
+#include <string>
+#include "cast.h"
+
+namespace shpp
+{
+	class parameter {
+
+		std::string type;
+		std::string name;
+
+		parameter(std::string type = "", std::string name = "");
+
+		public:
+			template <typename T> static parameter make_parameter(std::string name = "");
+
+			std::string get_type() const;
+			std::string get_name() const;
+	};
 }
 
-shpp::i_cmd::~i_cmd() {
-}
-
-std::string shpp::i_cmd::get_name() const {
-	return name;
-}
-
-unsigned int shpp::i_cmd::expected_args() const {
-	return num_args;
-}
+#endif // _SHPP_PARAMETER_HPP_

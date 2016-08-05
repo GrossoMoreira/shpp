@@ -16,20 +16,18 @@ BINDIR   = bin
 INSTALL_INCLUDES = /usr/local/include/shpp
 INSTALL_LIB = /usr/local/lib
 
-CC       = g++
-INCLUDE	 = -I. -Icpp-readline/src
-CFLAGS   = -std=c++11 -fPIC -Wall -Werror $(INCLUDE)
+CC       = g++-5
+INCLUDE	 = -I. -Ijsoncons/src
+CFLAGS   = -std=c++14 -fPIC -Wall $(INCLUDE)
 
 LIBS	 = -lreadline
 
 LINKER   = g++ -o
 LFLAGS   = -shared $(LIBS)
 
-READLINE = $(OBJDIR)/libcpp-readline.a
-
-SOURCES := $(wildcard $(SRCDIR)/*.cpp)
-INCLUDES := $(wildcard $(SRCDIR)/*.h) cpp-readline/src
-OBJECTS := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+SOURCES := $(wildcard $(SRCDIR)/*)
+INCLUDES := $(wildcard $(SRCDIR)/*.h)
+OBJECTS := $(SOURCES:$(SRCDIR)/%=$(OBJDIR)/%.o)
 rm = rm -f
 
 export
@@ -43,22 +41,19 @@ bindir:
 objdir:
 	@mkdir -p $(OBJDIR)
 
-$(READLINE): objdir
-	$(MAKE) -C cpp-readline
-	@cp cpp-readline/libcpp-readline.a $(READLINE)
+$(BINDIR)/$(TARGET): $(OBJECTS) bindir
+	$(LINKER) $@ $(LFLAGS) $(OBJECTS)
 
-$(BINDIR)/$(TARGET): $(OBJECTS) $(READLINE) bindir
-	$(LINKER) $@ $(LFLAGS) $(OBJECTS) $(READLINE)
-
-$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp $(READLINE) objdir
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/% objdir
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BINDIR)/example: $(BINDIR)/$(TARGET)
-	$(CC) -std=c++11 -L$(BINDIR) -I. example/main.cpp -o $(BINDIR)/example -lshpp
+	$(CC) -std=c++11 -L$(BINDIR) $(INCLUDE) example/main.cpp -o $(BINDIR)/example -lshpp
 
 install: $(BINDIR)/$(TARGET)
 	mkdir $(INSTALL_INCLUDES)
 	cp -r include/* $(INSTALL_INCLUDES)
+	cp json/src/json.hpp $(INSTALL_INCLUDES)
 	cp $(BINDIR)/$(TARGET) $(INSTALL_LIB)
 	ldconfig
 

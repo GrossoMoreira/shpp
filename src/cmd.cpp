@@ -18,34 +18,38 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-#ifndef _SHPP_I_CMD_H_
-#define _SHPP_I_CMD_H_
+#include "include/src/cmd.h"
 
-#include "cast.h"
-
-#include <string>
-#include <queue>
-#include <unordered_map>
-#include <iostream>
-#include <limits>
-
-namespace shpp
-{
-	class i_cmd {
-
-		std::string name;
-		unsigned int num_args;
-
-		public:
-			i_cmd(std::string, unsigned int);
-			virtual ~i_cmd();
-
-			std::string get_name() const;
-			unsigned int expected_args() const;
-
-			virtual std::string call(std::queue<std::string>) const = 0;
-	};
-
+void shpp::i_cmd::add_parameter(const shpp::parameter& p) {
+	params.push_back(p);
 }
 
-#endif // _SHPP_I_CMD_H_
+shpp::i_cmd::i_cmd(std::string name) : name(name) {
+}
+
+shpp::i_cmd::~i_cmd() {
+}
+
+std::string shpp::i_cmd::get_name() const {
+	return name;
+}
+
+shpp::i_cmd::args_t::size_type shpp::i_cmd::size() const {
+	return params.size();
+}
+
+shpp::i_cmd::iterator shpp::i_cmd::begin() {
+	return params.begin();
+}
+
+shpp::i_cmd::iterator shpp::i_cmd::end() {
+	return params.end();
+}
+
+shpp::i_cmd::const_iterator shpp::i_cmd::cbegin() const {
+	return params.cbegin();
+}
+
+shpp::i_cmd::const_iterator shpp::i_cmd::cend() const {
+	return params.cend();
+}

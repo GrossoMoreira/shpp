@@ -18,42 +18,56 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-#ifndef _SHPP_VARIABLE_CMD_HPP_
-#define _SHPP_VARIABLE_CMD_HPP_
+#ifndef _SHPP_I_CMD_H_
+#define _SHPP_I_CMD_H_
 
-#include "cmd.h"
+#include "parameter.hpp"
 
 #include <string>
+#include <vector>
 #include <queue>
-#include <unordered_map>
-#include <iostream>
-#include <limits>
 
 namespace shpp
 {
-	template <typename T> class variable_cmd : public i_cmd {
-
-		T& variable;
+	class i_cmd {
 
 		public:
-			variable_cmd(std::string name, T& var);
-			i_cmd::form get_form() const;
-			std::string get_return_type() const;
-			std::string call(std::queue<std::string>) const throw(out_of_range, no_cast_available, wrong_argument_count, invalid_argument);
-	};
+			enum form { variable, function };
 
-	template <typename T> class variable_cmd<const T> : public i_cmd {
+			typedef std::vector<parameter> args_t;
+			typedef args_t::iterator iterator;
+			typedef args_t::const_iterator const_iterator;
 
-		const T& variable;
+		private:
+
+			std::string name;
+			unsigned int num_args;
+
+			std::vector<parameter> params;
+
+		protected:
+
+			void add_parameter(const parameter&);
 
 		public:
-			variable_cmd(std::string name, const T& var);
-			i_cmd::form get_form() const;
-			std::string get_return_type() const;
-			std::string call(std::queue<std::string>) const throw(out_of_range, no_cast_available, wrong_argument_count, read_only_variable);
 
+			i_cmd(std::string name);
+			virtual ~i_cmd();
+
+			virtual form get_form() const = 0;
+			virtual std::string get_return_type() const = 0;
+
+			std::string get_name() const;
+			args_t::size_type size() const;
+
+			iterator begin();
+			iterator end();
+
+			const_iterator cbegin() const;
+			const_iterator cend() const;
+
+			virtual std::string call(std::queue<std::string>) const = 0;
 	};
-
 }
 
-#endif // _SHPP_VARIABLE_CMD_HPP_
+#endif // _SHPP_I_CMD_H_

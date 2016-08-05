@@ -3,17 +3,18 @@ Call c++ functions from a shell with any arguments of any types parsed automatic
 
 Declare a variable or define a function and register it in shpp with a simple command. Your function will be available to be called by a shell that parses the arguments automatically to the types of the arguments of your function.
 
-# features
-- call functions with any number of arguments of any primitive types
+# Features
+- list available functions, including their return type and parameter types
+- call functions with any number of arguments of any primitive types or stl-like non-associative containers
 - read and write variables (const/read-only variables supported)
-- when a function is called, output its return value (of any primitive type)
+- when a function is called, output its return value (of any supported type)
 - interactive and non interactive mode
-- using Svalorzen's cpp-readline library, shpp now features:
-	* auto-complete
-	* command history
-	* sourcing commands from files
+- auto-complete
+- command history
+- reverse search
+- sourcing commands from files
 
-# interface
+# Interface
 ```c++
 #include "shpp/shpp.h"
 
@@ -26,19 +27,27 @@ shpp::shell sh(svc);	// create a shell for this service
 sh.start();			// start shell
 ```
 
-# interactive shell
-![Interactive shell demo](https://cloud.githubusercontent.com/assets/17955551/15941826/c7da29f4-2e79-11e6-9d9e-2826638cefdf.gif "Interactive shell demo")
+# Interactive shell
+![Interactive shell demo](https://cloud.githubusercontent.com/assets/17955551/17453191/c089d6c2-5b6f-11e6-9c1c-d5e094b270da.gif "Interactive shell demo")
 
-# caveats
-- function overloading not allowed, because we wouldn't know which overload to call
-- only primitive types for variables, function arguments and function return values are supported, because we wouldn't know how to parse user defined types from/into strings. std::string is supported though, and more useful but simple types should be added soon
+# Supported types
 
-# dependencies
+- primitive types
+- stl-like non-associative containers (std::vector, std::list...) that implement the push_back() method, parsed/serialized as JSON objects
+- containers of containers
+
+```
+Sample std::vector<std::list<int>> :
+
+[[0,2,4],[1,3,5],[]]
+
+..can be used as a function parameter or return type.
+```
+
+# Dependencies
 - GNU readline
 
-# todo
-- give names to types, so that we can at least list the argument types of each function
-- add support for common types that may be useful, like std::vector<something>
+# Todo
 - support arguments of user-defined types
 - support asynchronous execution of commands
 - call functions remotely

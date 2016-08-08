@@ -40,7 +40,7 @@ template <typename T> std::string shpp::variable_cmd<T>::get_return_type() const
 	return translator<T>::name();
 }
 
-template <typename T> std::string shpp::variable_cmd<T>::call(std::queue<std::string> q) const throw(out_of_range, no_cast_available, wrong_argument_count, invalid_argument) {
+template <typename T> std::string shpp::variable_cmd<T>::call(std::queue<std::string> q) const {
 	if(q.empty())
 		return translator<T>::to_str(variable);
 	else if (q.size() > 1)
@@ -70,7 +70,7 @@ template <typename T> std::string shpp::variable_cmd<const T>::get_return_type()
 	return translator<const T>::name();
 }
 
-template <typename T> std::string shpp::variable_cmd<const T>::call(std::queue<std::string> q) const throw(out_of_range, no_cast_available, wrong_argument_count, read_only_variable) {
+template <typename T> std::string shpp::variable_cmd<const T>::call(std::queue<std::string> q) const {
 	if(q.empty())
 		return shpp::to_string<T>(variable);
 	

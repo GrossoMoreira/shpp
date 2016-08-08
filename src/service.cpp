@@ -27,7 +27,7 @@ void shpp::service::remove_command(std::string name) {
                 commands.erase(it);
 }
 
-std::string shpp::service::call(std::string name, std::queue<std::string> args) throw (cmd_not_found, out_of_range, no_cast_available, invalid_argument, wrong_argument_count, read_only_variable, command_exception) {
+std::string shpp::service::call(std::string name, std::queue<std::string> args) {
         auto it = commands.find(name);
         if (it == commands.end())
                 throw cmd_not_found(name);

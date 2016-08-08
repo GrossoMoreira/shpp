@@ -39,7 +39,7 @@ namespace shpp
 			variable_cmd(std::string name, T& var);
 			i_cmd::form get_form() const;
 			std::string get_return_type() const;
-			std::string call(std::queue<std::string>) const throw(out_of_range, no_cast_available, wrong_argument_count, invalid_argument);
+			std::string call(std::queue<std::string>) const;
 	};
 
 	template <typename T> class variable_cmd<const T> : public i_cmd {
@@ -50,7 +50,7 @@ namespace shpp
 			variable_cmd(std::string name, const T& var);
 			i_cmd::form get_form() const;
 			std::string get_return_type() const;
-			std::string call(std::queue<std::string>) const throw(out_of_range, no_cast_available, wrong_argument_count, read_only_variable);
+			std::string call(std::queue<std::string>) const;
 
 	};
 

@@ -43,7 +43,7 @@ namespace shpp
 			public:
 				converter(int n);
 				void for_each(std::function<void(const parameter&)>);
-				template <typename ... A> std::string call(std::queue<std::string> q, Ret(*func)(FA...), A... args) const throw (invalid_argument, no_cast_available, out_of_range, parse_exception, command_exception);
+				template <typename ... A> std::string call(std::queue<std::string> q, Ret(*func)(FA...), A... args) const;
 		};
 
 		template <typename Current, typename ... Next> class converter<Current, Next...> {
@@ -54,7 +54,7 @@ namespace shpp
 			public:
 				converter<Current, Next...>(int argN);
 				void for_each(std::function<void(const parameter&)>);
-				template <typename ... A> std::string call (std::queue<std::string> q, Ret(*func)(FA...), A... args) const throw (invalid_argument, no_cast_available, out_of_range, parse_exception, command_exception);
+				template <typename ... A> std::string call (std::queue<std::string> q, Ret(*func)(FA...), A... args) const;
 		};
 
 		Ret(*func)(FA...);
@@ -64,7 +64,7 @@ namespace shpp
 			function_cmd(std::string name, Ret(*)(FA...));
 			i_cmd::form get_form() const;
 			std::string get_return_type() const;
-			std::string call(std::queue<std::string> q) const throw (wrong_argument_count, invalid_argument, no_cast_available, out_of_range, parse_exception, command_exception);
+			std::string call(std::queue<std::string> q) const;
 	};
 
 } // namespace

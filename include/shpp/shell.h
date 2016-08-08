@@ -47,7 +47,7 @@ namespace shpp
 			static char* completion_matches_cb(const char* text, int state);
 
 			std::string execute(std::string command, std::queue<std::string> args, exec_result&);
-			std::string shell_commands(std::string command, std::queue<std::string> args, exec_result&) throw(cmd_not_found);
+			std::string shell_commands(std::string command, std::queue<std::string> args, exec_result&);
 
 			bool eval(const char* line);
 

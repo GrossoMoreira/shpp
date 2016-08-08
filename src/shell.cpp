@@ -256,7 +256,7 @@ std::string shpp::shell::execute(std::string cmd_name, std::queue<std::string> a
 	return result;
 }
 
-std::string shpp::shell::shell_commands(std::string cmd, std::queue<std::string> arguments, exec_result& code) throw(cmd_not_found) {
+std::string shpp::shell::shell_commands(std::string cmd, std::queue<std::string> arguments, exec_result& code) {
 	std::string ret;
 
 	if(cmd == exit) {

@@ -16,9 +16,9 @@ BINDIR   = bin
 INSTALL_INCLUDES = /usr/local/include/shpp
 INSTALL_LIB = /usr/local/lib
 
-CC       = g++-5
+CC       = g++
 INCLUDE	 = -Iinclude -Ijsoncons/src
-CFLAGS   = -std=c++14 -fPIC -Wall $(INCLUDE)
+CFLAGS   = -std=c++11 -fPIC -Wall $(INCLUDE)
 
 LIBS	 = -lreadline
 

@@ -48,7 +48,7 @@ $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/% objdir
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BINDIR)/example: $(BINDIR)/$(TARGET)
-	$(CC) -std=c++11 -L$(BINDIR) $(INCLUDE) example/main.cpp -o $(BINDIR)/example -lshpp
+	$(CC) -std=c++11 $(BINDIR) -Wl,-rpath=$(shell pwd)/$(BINDIR) $(INCLUDE) example/main.cpp -o $(BINDIR)/example -lshpp
 
 install: $(BINDIR)/$(TARGET)
 	mkdir $(INSTALL_INCLUDES)

@@ -18,12 +18,28 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-#include "include/src/exceptions.h"
+#include "shpp/exceptions.h"
 
-shpp::argument_exception::argument_exception() {
+shpp::argument_exception::argument_exception() : std::exception() {
 }
 
-shpp::argument_exception::argument_exception(unsigned int argN, std::string value) : argN(argN), value(value) {
+shpp::argument_exception::argument_exception(std::string s) :
+	std::exception(),
+	argN(0),
+	explanation(s)
+{
+}
+
+shpp::argument_exception::argument_exception(unsigned int argN, std::string value, std::string what) :
+	std::exception(),
+	argN(argN),
+	value(value),
+	explanation(what)
+{
+}
+
+const char* shpp::argument_exception::what() const noexcept {
+	return explanation.c_str();
 }
 
 shpp::no_cast_available::no_cast_available() : argument_exception() {
@@ -42,4 +58,7 @@ shpp::cmd_not_found::cmd_not_found(std::string cmd) : command(cmd) {
 }
 
 shpp::wrong_argument_count::wrong_argument_count(std::string command, unsigned int expected, unsigned int provided) : command(command), expected(expected), provided(provided) {
+}
+
+shpp::parse_exception::parse_exception(std::string what) : argument_exception(what) {
 }

@@ -18,7 +18,7 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-#include "include/src/cast.h"
+#include "shpp/cast.h"
 
 template <>
 char shpp::cast<char>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument) {

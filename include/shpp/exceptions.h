@@ -22,16 +22,21 @@
 #define _SHPP_EXCEPTIONS_HPP_
 
 #include <string>
+#include <exception>
 
 namespace shpp
 {
-	struct argument_exception
+	struct argument_exception : public std::exception
 	{
 		unsigned int argN;
 		std::string value;
+		std::string explanation;
 
 		argument_exception();
-		argument_exception(unsigned int, std::string);
+		argument_exception(std::string what);
+		argument_exception(unsigned int, std::string, std::string what = "");
+
+		const char* what() const noexcept;
 	};
 
 	struct no_cast_available : public argument_exception {
@@ -52,7 +57,11 @@ namespace shpp
 		cmd_not_found(std::string);
 	};
 
-	struct read_only_variable{
+	struct read_only_variable {
+	};
+
+	struct parse_exception : public argument_exception {
+		parse_exception(std::string what);
 	};
 
 	struct wrong_argument_count {

@@ -18,7 +18,7 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-#include "include/src/service.hpp"
+#include "shpp/service.hpp"
 
 void shpp::service::remove_command(std::string name) {
         auto it = commands.find(name);

@@ -132,14 +132,23 @@ namespace shpp
 		}
 
 		static C<F, E...> parse(std::string s) {
-			C<F, E...> c;
-			json j = json::parse(s);
-			for(auto& e : j.elements()) {
-				std::stringstream ss;
-				ss << pretty_print(e);
-				c.push_back(translator<F>::parse(ss.str()));
+
+			try {
+				C<F, E...> c;
+
+				json j = json::parse(s);
+
+				for(auto& e : j.elements()) {
+					std::stringstream ss;
+					ss << pretty_print(e);
+					c.push_back(translator<F>::parse(ss.str()));
+				}
+
+				return c;
+
+			} catch (jsoncons::parse_exception& e) {
+				throw parse_exception(e.what());
 			}
-			return c;
 		}
 
 		static std::string name() {

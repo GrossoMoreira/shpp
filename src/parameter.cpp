@@ -18,7 +18,7 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-#include "include/src/parameter.h"
+#include "shpp/parameter.h"
 
 shpp::parameter::parameter(std::string type, std::string name) : type(type), name(name) {
 }

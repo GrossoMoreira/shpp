@@ -18,9 +18,9 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-#include "include/src/shell.h"
-#include "include/src/exceptions.h"
-#include "include/src/nargv.h"
+#include "shpp/shell.h"
+#include "shpp/exceptions.h"
+#include "shpp/nargv.h"
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -247,6 +247,8 @@ std::string shpp::shell::execute(std::string cmd_name, std::queue<std::string> a
 		std::cout << shpp::shell::red << "ERROR: variable is read-only." << shpp::shell::none << std::endl;
 	} catch(shpp::wrong_argument_count e) {
 		std::cout << shpp::shell::red << "ERROR: wrong argument count (expected " << e.expected << ", found " << e.provided << ")." << shpp::shell::none << std::endl;
+	} catch (shpp::parse_exception& e) {
+		std::cout << red << "ERROR: could not parse argument " << e.argN << " (" << e.value << ") . " << e.what() << none << std::endl;
 	} catch(shpp::command_exception& e) {
 		std::cout << shpp::shell::red << "ERROR: exception thrown by " << cmd_name << "." << shpp::shell::none << std::endl;
 	}

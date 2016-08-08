@@ -18,7 +18,7 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-#include "include/src/cmd.h"
+#include "shpp/cmd.h"
 
 void shpp::i_cmd::add_parameter(const shpp::parameter& p) {
 	params.push_back(p);

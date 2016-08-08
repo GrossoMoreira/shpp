@@ -1,4 +1,4 @@
-#include "include/shpp.h"
+#include "shpp/shpp.h"
 
 #include <iostream>
 #include <vector>

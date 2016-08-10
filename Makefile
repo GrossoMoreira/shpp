@@ -33,22 +33,21 @@ rm = rm -f
 export
 
 all: $(BINDIR)/$(TARGET) $(BINDIR)/example
-	@date
 
-bindir:
+$(BINDIR):
 	@mkdir -p $(BINDIR)
 
-objdir:
+$(OBJDIR):
 	@mkdir -p $(OBJDIR)
 
-$(BINDIR)/$(TARGET): $(OBJECTS) bindir
+$(BINDIR)/$(TARGET): $(OBJECTS) | $(BINDIR) 
 	$(LINKER) $@ $(LFLAGS) $(OBJECTS)
 
-$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/% objdir
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/% | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BINDIR)/example: $(BINDIR)/$(TARGET)
-	$(CC) -std=c++11 $(BINDIR) -Wl,-rpath=$(shell pwd)/$(BINDIR) $(INCLUDE) example/main.cpp -o $(BINDIR)/example -lshpp
+	$(CC) -std=c++11 -Wl,-rpath=$(shell pwd)/$(BINDIR) $(INCLUDE) example/main.cpp -o $(BINDIR)/example -L$(BINDIR) -lshpp
 
 install: $(BINDIR)/$(TARGET)
 	mkdir $(INSTALL_INCLUDES)

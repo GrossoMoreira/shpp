@@ -3,7 +3,7 @@ Call c++ functions from a shell with any arguments of any types parsed automatic
 
 Declare a variable or define a function and register it in shpp with a simple command. Your function will be available to be called by a shell that parses the arguments automatically to the types of the arguments of your function.
 
-## Usage
+# Usage
 ```
 git clone --recursive https://github.com/GrossoMoreira/shpp
 cd shpp

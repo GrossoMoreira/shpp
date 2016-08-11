@@ -11,7 +11,7 @@ make
 bin/example
 ```
 
- Features
+# Features
 - list available functions, including their return type and parameter types
 - call functions with any number of arguments of any primitive types or stl-like non-associative containers
 - read and write variables (const/read-only variables supported)

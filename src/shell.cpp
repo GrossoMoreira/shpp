@@ -101,7 +101,7 @@ char* shpp::shell::completion_matches_cb(const char* text, int state) {
 		if(!match)
 			continue;
 				
-		char* result = (char*) malloc(sizeof(char) * cmd->get_name().size());
+		char* result = (char*) malloc(sizeof(char) * cmd->get_name().size() + 1);
 
 		if(!result)
 			continue;
@@ -228,6 +228,7 @@ std::string shpp::shell::execute(std::string cmd_name, std::queue<std::string> a
 	try {
 		std::cout << shpp::shell::green;
 		result = svc.call(cmd_name, arguments);
+		code = exec_ok;
 		std::cout << shpp::shell::none;
 	} catch(shpp::cmd_not_found e) {
 		std::cout << shpp::shell::none;
@@ -235,22 +236,37 @@ std::string shpp::shell::execute(std::string cmd_name, std::queue<std::string> a
 			result = shell_commands(cmd_name, arguments, code);
 		} catch (shpp::cmd_not_found e) {
 			std::cout << shpp::shell::red << "ERROR: command " << cmd_name << " not found." << shpp::shell::none << std::endl;
+			code = exec_error;
 		}
 
-	} catch(shpp::invalid_argument e) {
+	} catch(shpp::invalid_argument& e) {
 		std::cout << shpp::shell::red << "ERROR: argument " << e.argN << " is invalid." << shpp::shell::none << std::endl;
-	} catch(shpp::out_of_range e) {
+		code = exec_error;
+	} catch(shpp::out_of_range& e) {
 		std::cout << shpp::shell::red << "ERROR: argument " << e.argN << " is out of range." << shpp::shell::none << std::endl;
-	} catch(shpp::no_cast_available e) {
+		code = exec_error;
+	} catch(shpp::no_cast_available& e) {
 		std::cout << shpp::shell::red << "ERROR: no cast avaliable for argument " << e.argN << "." << shpp::shell::none << std::endl;
-	} catch(shpp::read_only_variable e) {
+		code = exec_error;
+	} catch(shpp::read_only_variable& e) {
 		std::cout << shpp::shell::red << "ERROR: variable is read-only." << shpp::shell::none << std::endl;
-	} catch(shpp::wrong_argument_count e) {
+		code = exec_error;
+	} catch(shpp::wrong_argument_count& e) {
 		std::cout << shpp::shell::red << "ERROR: wrong argument count (expected " << e.expected << ", found " << e.provided << ")." << shpp::shell::none << std::endl;
+		code = exec_error;
 	} catch (shpp::parse_exception& e) {
 		std::cout << red << "ERROR: could not parse argument " << e.argN << " (" << e.value << ") . " << e.what() << none << std::endl;
+		code = exec_error;
 	} catch(shpp::command_exception& e) {
-		std::cout << shpp::shell::red << "ERROR: exception thrown by " << cmd_name << "." << shpp::shell::none << std::endl;
+		std::cout << shpp::shell::red << "ERROR: exception thrown by " << cmd_name;
+
+		if(*e.what() == '\0')
+			std::cout << '.';
+		else
+			std::cout << ": " << e.what();
+
+		std::cout << shpp::shell::none << std::endl;
+		code = exec_error;
 	}
 
 	return result;

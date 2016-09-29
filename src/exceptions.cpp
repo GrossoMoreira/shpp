@@ -62,3 +62,16 @@ shpp::wrong_argument_count::wrong_argument_count(std::string command, unsigned i
 
 shpp::parse_exception::parse_exception(std::string what) : argument_exception(what) {
 }
+
+shpp::command_exception::command_exception()
+{
+}
+
+shpp::command_exception::command_exception(std::string s) : whatstr(s)
+{
+}
+
+const char* shpp::command_exception::what() const noexcept
+{
+	return whatstr.c_str();
+}

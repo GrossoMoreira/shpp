@@ -39,6 +39,8 @@ namespace shpp
 		public:
 			typedef std::unordered_map<std::string, i_cmd*>::const_iterator const_iterator;
 
+			~service();
+
 			template <typename R, typename ... T> void provide(std::string name, R(*func)(T...));
 			template <typename T> void provide(std::string name, T& var);
 			void remove_command(std::string name);

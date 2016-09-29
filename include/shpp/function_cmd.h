@@ -48,7 +48,7 @@ std::string shpp::function_cmd<Ret, FA...>::converter<T...>::call(std::queue<std
 	try {
 		return call_to_string<Ret, FA...>(func, args...);
 	} catch(std::exception& e) {
-		std::cout << e.what() << std::endl;
+		throw command_exception(e.what());
 	} catch(...) {
 		throw command_exception();
 	}

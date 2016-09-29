@@ -20,6 +20,12 @@
 
 #include "shpp/service.hpp"
 
+shpp::service::~service()
+{
+	for(auto& p : commands)
+		delete p.second;
+}
+
 void shpp::service::remove_command(std::string name) {
         auto it = commands.find(name);
         delete it->second;

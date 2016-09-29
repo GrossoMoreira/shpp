@@ -72,7 +72,15 @@ namespace shpp
 		wrong_argument_count(std::string, unsigned int, unsigned int);
 	};
 	
-	struct command_exception {};
+	struct command_exception {
+
+		std::string whatstr;
+
+		command_exception();
+		command_exception(std::string);
+
+		const char* what() const noexcept;
+	};
 
 } // namespace
 

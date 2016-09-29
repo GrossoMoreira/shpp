@@ -50,7 +50,7 @@ $(BINDIR)/example: $(BINDIR)/$(TARGET)
 	$(CC) -std=c++11 -Wl,-rpath=$(shell pwd)/$(BINDIR) $(INCLUDE) example/main.cpp -o $(BINDIR)/example -L$(BINDIR) -lshpp
 
 install: $(BINDIR)/$(TARGET)
-	mkdir $(INSTALL_INCLUDES)
+	mkdir -p $(INSTALL_INCLUDES)
 	cp -r include/shpp/* $(INSTALL_INCLUDES)
 	cp -r jsoncons/src/* $(INSTALL_INCLUDES)
 	cp $(BINDIR)/$(TARGET) $(INSTALL_LIB)

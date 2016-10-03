@@ -13,12 +13,12 @@ SRCDIR   = src
 OBJDIR   = obj
 BINDIR   = bin
 
-INSTALL_INCLUDES = /usr/local/include/shpp
+INSTALL_INCLUDES = /usr/local/include
 INSTALL_LIB = /usr/local/lib
 
 CC       = g++
 INCLUDE	 = -Iinclude -Ijsoncons/src
-CFLAGS   = -std=c++11 -fPIC -Wall $(INCLUDE)
+CFLAGS   = -std=c++11 -fPIC -Wall $(INCLUDE) -g
 
 LIBS	 = -lreadline
 
@@ -51,13 +51,15 @@ $(BINDIR)/example: $(BINDIR)/$(TARGET)
 
 install: $(BINDIR)/$(TARGET)
 	mkdir -p $(INSTALL_INCLUDES)
-	cp -r include/shpp/* $(INSTALL_INCLUDES)
+	cp -r include/shpp $(INSTALL_INCLUDES)
 	cp -r jsoncons/src/* $(INSTALL_INCLUDES)
 	cp $(BINDIR)/$(TARGET) $(INSTALL_LIB)
 	ldconfig
 
 uninstall:
-	rm -rf $(INSTALL_INCLUDES)
+	rm -rf $(INSTALL_INCLUDES)/shpp
+	rm -rf $(INSTALL_INCLUDES)/jsoncons
+	rm -rf $(INSTALL_INCLUDES)/jsoncons_ext
 	rm -f $(INSTALL_LIB)/$(TARGET)
 
 clean:

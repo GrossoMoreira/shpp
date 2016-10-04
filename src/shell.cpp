@@ -3,7 +3,7 @@
 
    shpp library: call c++ functions of a running program from a shell
 
-   This program is free software; you can shpp::shell::redistribute it and/or modify
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
@@ -128,51 +128,23 @@ void shpp::shell::print_about() {
 
 void shpp::shell::print_signature(i_cmd* cmd) {
 
-	std::string name_style;
-	std::string return_style;
-	std::string param_style;
-	std::string punct_style;
-
-	switch(colors) {
-		case colors_disabled:
-			name_style = none;
-			return_style = none;
-			param_style = none;
-			punct_style = none;
-			break;
-
-		case colors_enabled:
-			name_style = none;
-			return_style = cyan;
-			param_style = lightcyan;
-			punct_style = none;
-			break;
-
-		default:
-			name_style = none;
-			return_style = none;
-			param_style = none;
-			punct_style = none;
-			break;
-	}
-
 	switch(cmd->get_form()) {
 		case i_cmd::variable:
-			std::cout << bold << " - " << none << return_style << cmd->get_return_type() << none << " " << name_style << cmd->get_name() <<none << std::endl;
+			std::cout << bold << " - " << none << style_return << cmd->get_return_type() << none << " " << style_name << cmd->get_name() <<none << std::endl;
 			break;
 
 		case i_cmd::function:
-			std::cout << bold << " - " <<  none << return_style << cmd->get_return_type() << " " << none << name_style << cmd->get_name() << none << punct_style << "(" << none;
+			std::cout << bold << " - " <<  none << style_return << cmd->get_return_type() << " " << none << style_name << cmd->get_name() << none << "(" << none;
 			
 			bool first = true;
 			for(const parameter& p : *cmd) {
 				if(!first)
-					std::cout << punct_style << ", " << none;
+					std::cout << ", " << none;
 				first = false;
-				std::cout << param_style << p.get_type() << none;
+				std::cout << style_param << p.get_type() << none;
 			}
 
-			std::cout << punct_style << ")" << none << std::endl;
+			std::cout << ")" << none << std::endl;
 			break;
 
 	}
@@ -215,57 +187,81 @@ void shpp::shell::source_files(std::queue<std::string> file_names) {
 	interactive = interactive_status;
 }
 
+void shpp::shell::init_colors(color_mode mode)
+{
+	switch(mode)
+	{
+		case colors_enabled:
+			style_return = cyan; 
+			style_name = none;
+			style_param = lightcyan;
+			style_error = red;
+			style_cout= green;
+			break;
+
+		case colors_disabled:
+		default:
+			style_return = "";
+			style_name = "";
+			style_param = "";
+			style_error = "";
+			style_cout = "";
+	}
+
+}
+
 shpp::shell::shell(shpp::service& s, color_mode colors) :
 	interactive(isatty(fileno(stdin))),
-	svc(s),
-	colors(colors) {
+	svc(s)
+{
 	singleton = this;
+	init_colors(colors);
 }
 
 std::string shpp::shell::execute(std::string cmd_name, std::queue<std::string> arguments, exec_result& code) {
 	std::string result;
 
 	try {
-		std::cout << shpp::shell::green;
+		std::cout << style_cout;
 		result = svc.call(cmd_name, arguments);
 		code = exec_ok;
-		std::cout << shpp::shell::none;
+		std::cout << none;
 	} catch(shpp::cmd_not_found e) {
-		std::cout << shpp::shell::none;
+		std::cout << none;
 		try {
 			result = shell_commands(cmd_name, arguments, code);
 		} catch (shpp::cmd_not_found e) {
-			std::cout << shpp::shell::red << "ERROR: command " << cmd_name << " not found." << shpp::shell::none << std::endl;
+			std::cout << style_error << "ERROR: command " << cmd_name << " not found." << none << std::endl;
 			code = exec_error;
 		}
 
 	} catch(shpp::invalid_argument& e) {
-		std::cout << shpp::shell::red << "ERROR: argument " << e.argN << " is invalid." << shpp::shell::none << std::endl;
+		std::cout << style_error << "ERROR: argument " << e.argN << " is invalid." << none << std::endl;
 		code = exec_error;
 	} catch(shpp::out_of_range& e) {
-		std::cout << shpp::shell::red << "ERROR: argument " << e.argN << " is out of range." << shpp::shell::none << std::endl;
+		std::cout << style_error << "ERROR: argument " << e.argN << " is out of range." << none << std::endl;
 		code = exec_error;
 	} catch(shpp::no_cast_available& e) {
-		std::cout << shpp::shell::red << "ERROR: no cast avaliable for argument " << e.argN << "." << shpp::shell::none << std::endl;
+		std::cout << style_error << "ERROR: no cast avaliable for argument " << e.argN << "." << none << std::endl;
 		code = exec_error;
 	} catch(shpp::read_only_variable& e) {
-		std::cout << shpp::shell::red << "ERROR: variable is read-only." << shpp::shell::none << std::endl;
+		std::cout << style_error << "ERROR: variable is read-only." << none << std::endl;
 		code = exec_error;
 	} catch(shpp::wrong_argument_count& e) {
-		std::cout << shpp::shell::red << "ERROR: wrong argument count (expected " << e.expected << ", found " << e.provided << ")." << shpp::shell::none << std::endl;
+		std::cout << style_error << "ERROR: wrong argument count (expected " << e.expected << ", found " << e.provided << ")." << none << std::endl;
 		code = exec_error;
 	} catch (shpp::parse_exception& e) {
 		std::cout << red << "ERROR: could not parse argument " << e.argN << " (" << e.value << ") . " << e.what() << none << std::endl;
 		code = exec_error;
 	} catch(shpp::command_exception& e) {
-		std::cout << shpp::shell::red << "ERROR: exception thrown by " << cmd_name;
+		std::cout << style_error << "ERROR: exception thrown by " << cmd_name;
 
 		if(*e.what() == '\0')
 			std::cout << '.';
 		else
 			std::cout << ": " << e.what();
 
-		std::cout << shpp::shell::none << std::endl;
+		std::cout << none << std::endl;
 		code = exec_error;
 	}
 

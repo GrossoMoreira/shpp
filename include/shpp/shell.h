@@ -58,8 +58,16 @@ namespace shpp
 
 			bool interactive;
 			service& svc;
-			color_mode colors;
 			std::string last_command;
+
+			// colors
+			std::string style_return;
+			std::string style_name;
+			std::string style_param;
+			std::string style_error;
+			std::string style_cout;
+
+			void init_colors(color_mode);
 
 		public:
 

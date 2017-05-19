@@ -43,7 +43,7 @@ namespace shpp
 			public:
 				converter(int n);
 				void for_each(std::function<void(const parameter&)>);
-				template <typename ... A> std::string call(std::queue<std::string> q, Ret(*func)(FA...), A... args) const;
+				template <typename ... A> std::string call(std::queue<std::string> q, std::function<Ret(FA...)> func, A... args) const;
 		};
 
 		template <typename Current, typename ... Next> class converter<Current, Next...> {
@@ -54,14 +54,14 @@ namespace shpp
 			public:
 				converter<Current, Next...>(int argN);
 				void for_each(std::function<void(const parameter&)>);
-				template <typename ... A> std::string call (std::queue<std::string> q, Ret(*func)(FA...), A... args) const;
+				template <typename ... A> std::string call (std::queue<std::string> q, std::function<Ret(FA...)> func, A... args) const;
 		};
 
-		Ret(*func)(FA...);
+		std::function<Ret(FA...)> func;
 		converter<FA...> conv;
 
 		public:
-			function_cmd(std::string name, Ret(*)(FA...));
+			function_cmd(std::string name, std::function<Ret(FA...)> func);
 			i_cmd::form get_form() const;
 			std::string get_return_type() const;
 			std::string call(std::queue<std::string> q) const;

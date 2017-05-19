@@ -16,20 +16,8 @@ void types_test(int i, float f, std::string d) {
 	std::cout << "int: " << i << ", float: " << f << ", string: " << d << std::endl;
 }
 
-double vec_sum(std::vector<double> v)
-{
-	double s = 0;
-	for(double n : v)
-		s += n;
-	return s;
-}
 
 std::vector<int> count(int from, int to) {
-	std::vector<int> v;
-	for(; from <= to; ++from)
-		v.push_back(from);
-
-	return v;
 }
 
 // Example variable
@@ -38,15 +26,35 @@ int some_variable = 1337;
 
 // Example use case
 
-int main() {
+struct sample_struct
+{
+	double vec_sum(std::vector<double> v)
+	{
+		double s = 0;
+		for(double n : v)
+			s += n;
+		return s;
+	}
+};
 
+int main() {
 	shpp::service svc;
 
-	svc.provide("exception_test", exception_test);
-	svc.provide("types_test", types_test);
-	svc.provide("vec_sum", vec_sum);
-	svc.provide("count", count);
-	svc.provide("some_var", some_variable);
+	svc.provide_command("exception_test", exception_test);
+	svc.provide_command("types_test", types_test);
+
+	sample_struct sum;
+	svc.provide_command("vec_sum", &sample_struct::vec_sum, &sum);
+
+	svc.provide_command("count", [](int from, int to) -> std::vector<int> {
+								std::vector<int> v;
+								for(; from <= to; ++from)
+									v.push_back(from);
+
+								return v;
+							 });
+
+	svc.provide_value("some_var", some_variable);
 
 	shpp::shell sh(svc);
 	sh.start();

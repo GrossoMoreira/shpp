@@ -31,6 +31,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <limits>
+#include <functional>
 
 template <typename Ret, typename ... FA>
 template <typename ... T>
@@ -44,7 +45,7 @@ void shpp::function_cmd<Ret, FA...>::converter<T...>::for_each(std::function<voi
 template <typename Ret, typename ... FA>
 template <typename ... T>
 template <typename ... A>
-std::string shpp::function_cmd<Ret, FA...>::converter<T...>::call(std::queue<std::string> s, Ret(*func)(FA...), A ... args) const {
+std::string shpp::function_cmd<Ret, FA...>::converter<T...>::call(std::queue<std::string> s, std::function<Ret(FA...)> func, A ... args) const {
 	try {
 		return call_to_string<Ret, FA...>(func, args...);
 	} catch(std::exception& e) {
@@ -69,7 +70,7 @@ void shpp::function_cmd<Ret, FA...>::converter<Current,Next...>::for_each(std::f
 template <typename Ret, typename ... FA>
 template <typename Current, typename ... Next>
 template <typename ... A>
-std::string shpp::function_cmd<Ret, FA...>::converter<Current,Next...>::call(std::queue<std::string> stack, Ret(*func)(FA...), A ... args) const {
+std::string shpp::function_cmd<Ret, FA...>::converter<Current,Next...>::call(std::queue<std::string> stack, std::function<Ret(FA...)> func, A ... args) const {
 	std::string arg = stack.front();
 	stack.pop();
 
@@ -94,7 +95,7 @@ std::string shpp::function_cmd<Ret, FA...>::converter<Current,Next...>::call(std
 }
 
 template <typename Ret, typename ... FA>
-shpp::function_cmd<Ret, FA...>::function_cmd(std::string name, Ret(*func)(FA...)) : i_cmd(name), func(func), conv(1) {
+shpp::function_cmd<Ret, FA...>::function_cmd(std::string name, std::function<Ret(FA...)> func) : i_cmd(name), func(func), conv(1) {
 	conv.for_each(
 			[this](const parameter& p) {
 				this->add_parameter(p);

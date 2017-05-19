@@ -31,14 +31,54 @@
 #include <unordered_map>
 #include <iostream>
 #include <limits>
+#include <functional>
+#include <type_traits>
+
+namespace {
+	template <typename Function>
+	struct function_traits : public function_traits<decltype(&Function::operator())> {};
+
+	template <typename ClassType, typename ReturnType, typename... Args>
+	struct function_traits<ReturnType(ClassType::*)(Args...) const> {
+		 using return_type = ReturnType;
+		 using pointer = ReturnType (*)(Args...);
+		 using std_function = std::function<ReturnType(Args...)>;
+	};
+
+	template <typename Function>
+	typename function_traits<Function>::std_function to_function (Function& lambda) {
+		 return typename function_traits<Function>::std_function(lambda);
+	}
+
+	template <template <typename ...> class F, typename R, typename ... T>
+	shpp::function_cmd<R, T...>* mk_function_cmd(std::string name, F<R(T...)> func)
+	{
+		return new shpp::function_cmd<R, T...>(name, func);
+	}
+}
 
 template <typename R, typename ... T>
-void shpp::service::provide(std::string name, R(*func)(T...)) {
+void shpp::service::provide_command(std::string name, R(*funcPtr)(T...)) {
+	std::function<R(T...)> func(funcPtr);
 	commands[name] = new function_cmd<R, T...>(name, func);
 }
 
+template <typename C, typename R, typename ... T>
+void shpp::service::provide_command(std::string name, R(C::*funcPtr)(T...), C* object) {
+	std::function<R(T...)> func([=](T... args) -> R {
+			return ((*object).*funcPtr)(args...);
+		});
+	commands[name] = new function_cmd<R, T...>(name, func);
+}
+
+template <typename L>
+void shpp::service::provide_command(std::string name, L lambda) {
+	auto func = to_function(lambda);
+	commands[name] = mk_function_cmd(name, func);
+}
+
 template <typename T>
-void shpp::service::provide(std::string name, T& var) {
+void shpp::service::provide_value(std::string name, T& var) {
 	commands[name] = new variable_cmd<T>(name, var);
 }
 

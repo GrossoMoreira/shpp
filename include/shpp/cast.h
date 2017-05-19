@@ -29,6 +29,7 @@
 #include "jsoncons/json.hpp"
 
 #include <limits>
+#include <functional>
 #include <stdexcept>
 #include <string>
 #include <sstream>
@@ -194,20 +195,20 @@ namespace shpp
 
 	template <typename Ret> class devoid {
 		public:
-			template <typename ... Args> static std::string call(Ret(*f)(Args...), Args... args) {
+			template <typename ... Args> static std::string call(std::function<Ret(Args...)> f, Args... args) {
 				return translator<Ret>::to_str(f(args...));
 			}
 	};
 
 	template <> class devoid<void> {
 		public:
-			template <typename ... Args> static std::string call(void(*f)(Args...), Args... args) {
+			template <typename ... Args> static std::string call(std::function<void(Args...)> f, Args... args) {
 				f(args...);
 				return std::string();
 			}
 	};
 
-	template <typename Ret, typename ... Args> std::string call_to_string(Ret(*f)(Args...), Args... args) {
+	template <typename Ret, typename ... Args> std::string call_to_string(std::function<Ret(Args...)> f, Args... args) {
 		return devoid<Ret>::call(f, args...);
 	}
 

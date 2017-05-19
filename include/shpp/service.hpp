@@ -41,8 +41,11 @@ namespace shpp
 
 			~service();
 
-			template <typename R, typename ... T> void provide(std::string name, R(*func)(T...));
-			template <typename T> void provide(std::string name, T& var);
+			template <typename R, typename ... T> void provide_command(std::string name, R(*func)(T...));
+			template <typename C, typename R, typename ... T> void provide_command(std::string name, R(C::*func)(T...), C* object);
+			template <typename L> void	provide_command(std::string name, L lambda);
+			template <typename T> void provide_value(std::string name, T& var);
+
 			void remove_command(std::string name);
 			std::string call(std::string name, std::queue<std::string> args);
 			const_iterator begin() const;

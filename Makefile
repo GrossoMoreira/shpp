@@ -17,7 +17,7 @@ INSTALL_INCLUDES = /usr/local/include
 INSTALL_LIB = /usr/local/lib
 
 CC       = g++
-INCLUDE	 = -Iinclude -Ijsoncons/src
+INCLUDE	 = -Iinclude -Ijsoncons/include
 CFLAGS   = -std=c++11 -fPIC -Wall $(INCLUDE) -g
 
 LIBS	 = -lreadline
@@ -52,7 +52,7 @@ $(BINDIR)/example: $(BINDIR)/$(TARGET)
 install: $(BINDIR)/$(TARGET)
 	mkdir -p $(INSTALL_INCLUDES)
 	cp -r include/shpp $(INSTALL_INCLUDES)
-	cp -r jsoncons/src/* $(INSTALL_INCLUDES)
+	cp -r jsoncons/include/* $(INSTALL_INCLUDES)
 	cp $(BINDIR)/$(TARGET) $(INSTALL_LIB)
 	ldconfig
 

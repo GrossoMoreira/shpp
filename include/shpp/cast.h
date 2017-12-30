@@ -52,20 +52,20 @@ namespace shpp
 			throw std::out_of_range("is below numeric limit!");
 	};
 
-	template <typename T> T cast(std::string) throw(no_cast_available, std::out_of_range, std::invalid_argument)
+	template <typename T> T cast(std::string)
 	{
 		throw no_cast_available(0, "");
 	}
 
-	template <> char cast<char>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument);
-	template <> short cast<short>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument);
-	template <> int cast<int>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument);
-	template <> long cast<long>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument);
-	template <> float cast<float>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument);
-	template <> double cast<double>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument);
-	template <> long double cast<long double>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument);
-	template <> std::string cast<std::string>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument);
-	template <> const char* cast<const char*>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument);
+	template <> char cast<char>(std::string s);
+	template <> short cast<short>(std::string s);
+	template <> int cast<int>(std::string s);
+	template <> long cast<long>(std::string s);
+	template <> float cast<float>(std::string s);
+	template <> double cast<double>(std::string s);
+	template <> long double cast<long double>(std::string s);
+	template <> std::string cast<std::string>(std::string s);
+	template <> const char* cast<const char*>(std::string s);
 
 	// Converting from argument type to string
 

@@ -21,7 +21,7 @@
 #include "shpp/cast.h"
 
 template <>
-char shpp::cast<char>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument) {
+char shpp::cast<char>(std::string s) {
         if(s.size() > 0)
                 return s[0];
         else
@@ -29,43 +29,43 @@ char shpp::cast<char>(std::string s) throw(no_cast_available, std::out_of_range,
 }
 
 template <>
-short shpp::cast<short>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument) {
+short shpp::cast<short>(std::string s) {
         int v = std::stoi(s);
         test_num_limit<int,short>(v);
         return (short) v;
 }
 
 template <>
-int shpp::cast<int>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument) {
+int shpp::cast<int>(std::string s) {
 	return std::stoi(s);
 }
 
 template <>
-long shpp::cast<long>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument) {
+long shpp::cast<long>(std::string s) {
 	return std::stol(s);
 }
 
 template <>
-float shpp::cast<float>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument) {
+float shpp::cast<float>(std::string s) {
 	return std::stof(s);
 }
 
 template <>
-double shpp::cast<double>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument) {
+double shpp::cast<double>(std::string s) {
 	return std::stod(s);
 }
 
 template <>
-long double shpp::cast<long double>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument) {
+long double shpp::cast<long double>(std::string s) {
 	return std::stold(s);
 }
 
 template <>
-std::string shpp::cast<std::string>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument) {
+std::string shpp::cast<std::string>(std::string s) {
 	return s;
 }
 
 template <>
-const char* shpp::cast<const char*>(std::string s) throw(no_cast_available, std::out_of_range, std::invalid_argument) {
+const char* shpp::cast<const char*>(std::string s) {
 	return s.c_str();
 }

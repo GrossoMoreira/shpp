@@ -28,8 +28,8 @@ bin/example
 
 shpp::service svc;	// create a service
 
-svc.provide("function_name", function_ptr);
-svc.provide("variable_name", variable_ref);
+svc.provide_command("function_name", function_ptr);
+svc.provide_value("variable_name", variable_ref);
 
 shpp::shell sh(svc);	// create a shell for this service
 sh.start();			// start shell
